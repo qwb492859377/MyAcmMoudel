@@ -1,0 +1,61 @@
+const double exps = 1e-8;
+typedef vector<double> vec;
+typedef vector<vec> mat;
+
+int dcmp(double x) {
+    if(fabs(x) < exps) return 0;
+    return x < 0 ? -1 : 1;
+}
+
+void guass(mat &A, int m, int n) {
+    for(int i = 0; i < m; i++) {
+        int pv = i, id;
+        for(int j = 0; j <= n; j++) {
+            for(int k = i + 1; k < m; k++) {
+                if(fabs(A[k][j]) > fabs(A[pv][j])) {
+                    pv = k;
+                }
+            }
+            if(dcmp(A[pv][j])) break;
+        }
+        swap(A[i], A[pv]);
+
+        for(id = 0; id <= n && !dcmp(A[i][id]); id++);
+        if(id > n) return;
+
+        for(int j = i + 1; j < m; j++) {
+            if(!dcmp(A[j][id])) continue;
+
+            double f = A[j][id] / A[i][id];
+            for(int k = id + 1; k <= n; k++) A[j][k] -= A[i][k] * f;
+            A[j][id] = 0;
+        }
+    }
+}
+
+int solve(mat &A) {
+    int m = A.size(), n = A[0].size() - 1;
+    guass(A, m, n);
+
+    int r1 = 0, r2 = 0;
+    for(int i = 0; i < m; i++) {
+        bool sign = true;
+        for(int j = 0; j <= n; j++) {
+            if(dcmp(A[i][j])) {
+                r2++;
+                if(j < n) r1++;
+                sign = false;
+                break;
+            }
+        }
+        if(sign) break;
+    }
+
+    if(r1 != r2) return -1;
+    if(r1 == r2 && r1 != n) return 0;
+    for(int i = n - 1; i >= 0; i--) {
+        A[i][n] /= A[i][i];
+        for(int j = i - 1; j >= 0; j--) A[j][n] -= A[i][n] * A[j][i];
+    }
+    return 1;
+}

@@ -1,0 +1,65 @@
+#include<cstdio>
+#include<cstring>
+#include<cmath>
+#include<algorithm>
+using namespace std;
+
+typedef long long LL;
+const int MX = 2e5 + 5;
+
+int rear;
+int Head[MX], Next[MX];
+
+struct Edge {
+    int u, v;
+} E[MX];
+
+void edge_init() {
+    rear = 0;
+    memset(Head, -1, sizeof(Head));
+    memset(Next, -1, sizeof(Next));
+}
+
+void edge_add(int u, int v) {
+    E[rear].u = u;
+    E[rear].v = v;
+    Next[rear] = Head[u];
+    Head[u] = rear++;
+}
+
+int solve(int u, int from, int &ans) {
+    int Max1 = 0, Max2 = 0;
+    for(int id = Head[u]; ~id; id = Next[id]) {
+        int v = E[id].v;
+        if(v == from) continue;
+
+        int t = solve(v, u, ans) + 1;
+
+        if(t > Max1) {
+            Max2 = Max1;
+            Max1 = t;
+        } else if(t > Max2) Max2 = t;
+    }
+
+    ans = max(ans, Max1 + Max2);
+    return Max1;
+}
+
+int main() {
+    int n, last;
+    while(~scanf("%d", &n)) {
+        edge_init();
+        for(int i = 1; i <= n - 1; i++) {
+            int u, v;
+            scanf("%d%d", &u, &v);
+            edge_add(u, v);
+            edge_add(v, u);
+            last = u;
+        }
+
+        int ans = 0;
+        solve(last, -1, ans);
+        printf("%d\n", ans);
+    }
+    return 0;
+}

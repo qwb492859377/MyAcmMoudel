@@ -1,0 +1,82 @@
+const int MX = 2e4 + 5;//数组大小
+const int HS = 1000007;//哈希大小
+
+char word[MX][35];
+int H_head[HS], H_next[MX], H_rear;
+
+int Hash(char*S) {
+    int len = strlen(S), ret = 0;
+    for(int i = 0; i < len; i++) {
+        ret = ret * 131 + S[i];
+    }
+    return (ret & 0x7fffffff) % HS;
+}
+
+void Hash_init() {
+    H_rear = 0;
+    memset(H_head, -1, sizeof(H_head));
+    memset(H_next, -1, sizeof(H_next));
+}
+
+/*返回-1表示不存在*/
+int Hash_query(char*S) {
+    int h = Hash(S);
+
+    for(int i = H_head[h]; ~i; i = H_next[i]) {
+        if(strcmp(word[i], S) == 0) return i;
+    }
+    return -1;
+}
+
+/*返回添加的下标,从0开始*/
+int Hash_add(char*S) {
+    int h = Hash(S);
+
+    for(int i = H_head[h]; ~i; i = H_next[i]) {
+        if(strcmp(word[i], S) == 0) return i;
+    }
+
+    strcpy(word[H_rear], S);
+    H_next[H_rear] = H_head[h];
+    H_head[h] = H_rear;
+    return H_rear++;
+}
+
+
+const int MX = 2e4 + 5;
+const int HS = 1000007;
+
+LL H_T[MX];
+int H_head[HS], H_next[MX], H_rear;
+
+int Hash(LL S) {
+    return S % HS;
+}
+
+void Hash_init() {
+    H_rear = 0;
+    memset(H_head, -1, sizeof(H_head));
+    memset(H_next, -1, sizeof(H_next));
+}
+
+int Hash_add(LL S) {
+    int h = Hash(S);
+
+    for(int i = H_head[h]; ~i; i = H_next[i]) {
+        if(H_T[i] == S) return i;
+    }
+
+    H_T[H_rear] = S;
+    H_next[H_rear] = H_head[h];
+    H_head[h] = H_rear;
+    return H_rear++;
+}
+
+int Hash_query(LL S) {
+    int h = Hash(S);
+
+    for(int i = H_head[h]; ~i; i = H_next[i]) {
+        if(H_T[i] == S) return i;
+    }
+    return -1;
+}

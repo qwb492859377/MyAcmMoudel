@@ -1,0 +1,37 @@
+/*O(nlogn)*/
+int prime[100000], vis[MX], rear = 0;
+void init() {
+    rear = 0;
+    vis[1] = 1;
+    for(int i = 2; i < MX; i++) {
+        if(vis[i]) continue;
+        prime[++rear] = i;
+
+        if((LL)i * i >= MX) continue;
+        for(int j = i * i; j < MX; j += i) {
+            vis[j] = 1;
+        }
+    }
+}
+
+/*O(n)*/
+int vis[MX], Prime[800000], rear;
+void init() { //vis[i]==1 表示不是质数
+    rear = 0; vis[1] = 1;
+    for(int i = 2; i < MX; i++) {
+        if(!vis[i]) Prime[++rear] = i;
+
+        for(int j = 1; j <= rear && i * Prime[j] < MX; j++) {
+            vis[i * Prime[j]] = 1;
+            if(!i % Prime[j]) break;
+        }
+    }
+}
+
+/*点试法*/
+bool is_prime(LL x) {
+    for(int i = 2; (LL)i * i <= x; i++) {
+        if(!(x % i)) return false;
+    }
+    return true;
+}

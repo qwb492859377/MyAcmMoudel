@@ -1,0 +1,28 @@
+int rear;
+int S[MX << 2];
+/*这个是最小堆*/
+void push(int x) {
+    int now = ++rear, pre = now >> 1;
+    S[now] = x;
+    while(pre && S[pre] > S[now]) {
+        swap(S[now], S[pre]);
+        now = pre, pre = now >> 1;
+    }
+}
+
+void pop() {
+    S[1] = S[rear--];
+
+    int now = 1;
+    while((now << 1) <= rear) {
+        int lt = now << 1, rt = now << 1 | 1;
+        if(rt <= rear) {
+            if(S[lt] >= S[now] && S[rt] >= S[now]) break;
+            if(S[now] >= S[lt] && S[rt] >= S[lt]) swap(S[now], S[lt]), now = lt;
+            else swap(S[now], S[rt]), now = rt;
+        } else {
+            if(S[lt] > S[now]) break;
+            swap(S[now], S[lt]), now = lt;
+        }
+    }
+}

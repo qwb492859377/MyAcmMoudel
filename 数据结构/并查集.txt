@@ -1,0 +1,23 @@
+/*带权的并查集*/
+int P[MX], Rank[MX];
+
+int find(int x) {
+    return P[x] == x ? x : (P[x] = find(P[x]));
+}
+
+void Union(int u, int v) {
+    int x = find(u), y = find(v);
+    if(x == y) return;
+
+    if(Rank[x] < Rank[y]) {
+        P[x] = y;
+    } else {
+        P[y] = x;
+        if(Rank[x] == Rank[y]) Rank[x]++;
+    }
+}
+
+void find_init(int n) {
+    memset(Rank, 0, sizeof(Rank));
+    for(int i = 1; i <= n; i++) P[i] = i;
+}

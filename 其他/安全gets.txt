@@ -1,0 +1,6 @@
+bool safe_gets(char *S){
+	int n = strlen(S);
+	if(!gets(S)) return false;
+	if(n && S[n - 1] =='\r') S[n - 1] = 0;
+	return true;
+}

@@ -1,0 +1,15 @@
+//MS边数，注意是双向边
+struct Edge {
+    int v, nxt, cost;
+} E[MS];
+int rear, Head[MX];
+void edge_init() {
+    rear = 0;
+    memset(Head, -1, sizeof(Head));
+}
+void edge_add(int u, int v, int cost) {
+    E[rear].v = v;
+    E[rear].cost = cost;
+    E[rear].nxt = Head[u];
+    Head[u] = rear++;
+}

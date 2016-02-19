@@ -1,0 +1,43 @@
+#include<cstdio>
+#include<cstdlib>
+#include<cstring>
+#include<cctype>
+#include<cmath>
+#include<vector>
+#include<queue>
+#include<stack>
+#include<algorithm>
+using namespace std;
+typedef long long LL;
+const int MX=5000000+5;
+
+char S[MX];
+
+int solve(char*s,int l){
+    int i=0,j=1,k=0,t;
+    while(i<l&&j<l&&k<l){
+        t=s[(i+k)>=l?i+k-1:i+k]-s[(j+k)>=l?j+k-l:j+k];
+        if(!t) k++;
+        else{
+            if(t>0) i=i+k+1;
+            else j=j+k+1;
+            if(i==j) j++;
+            k=0;
+        }
+    }
+    return min(i,j);
+}
+
+int main(){
+    int T;
+    scanf("%d",&T);
+
+    while(T--){
+        scanf("%s",S);
+        printf("%d\n",solve(S,strlen(S)));
+    }
+    return 0;
+}
+
+
+一个字符串，通过移位，输出字典序最小的

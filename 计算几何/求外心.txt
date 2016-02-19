@@ -1,0 +1,9 @@
+Point solve(Point p1, Point p2, Point p3) {
+    double A1 = 2 * (p2.x - p1.x), B1 = 2 * (p2.y - p1.y), C1 = (p1.x * p1.x - p2.x * p2.x + p1.y * p1.y - p2.y * p2.y);
+    double A2 = 2 * (p3.x - p2.x), B2 = 2 * (p3.y - p2.y), C2 = (p2.x * p2.x - p3.x * p3.x + p2.y * p2.y - p3.y * p3.y);
+
+    Point ret;
+    ret.x = (C2 * B1 - C1 * B2) / (A1 * B2 - A2 * B1);
+    ret.y = (C2 * A1 - C1 * A2) / (A2 * B1 - A1 * B2);
+    return ret;
+}

@@ -1,0 +1,32 @@
+//W是距离,n是除了起点以外的数量，0为原点
+int TSP() {
+    memset(dp, 0x3f, sizeof(dp));
+
+    for(int S = 0; S <= (1 << n) - 1; S++) {
+        for(int i = 1; i <= n; i++) {
+            if(S & (1 << (i - 1))) {
+                if(S == (1 << (i - 1))) dp[i][S] = W[0][i];
+                else for(int j = 1; j <= n; j++) {
+                        if(S & (1 << (j - 1)) && j != i) {
+                            dp[i][S] = min(dp[i][S], dp[j][S ^ (1 << (i - 1))] + W[j][i]);
+                        }
+                    }
+            }
+        }
+    }
+
+    int ret = INF;
+    for(int i = 1; i <= n; i++) {
+        ret = min(ret, dp[i][(1 << n) - 1] + W[0][i]);
+    }
+
+    /*
+    若不需要回到起点，只需要全部走完，那么直接这样写
+    int ret=INF;
+    for(int i=1;i<=n;i++){
+        ret=min(ret,dp[i][(1<<n)-1]);
+    }
+    也就是说不需要加上了那W[0][i]而已
+    */
+    return ret;
+}

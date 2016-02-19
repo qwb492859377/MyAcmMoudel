@@ -1,0 +1,78 @@
+int const MX = 1e3 + 5;
+
+int rear, cnt[MX << 2];
+double A[MX], S[MX << 2];
+
+struct Que {
+    int d;
+    double top, L, R;
+    Que() {}
+    Que(double _top, double _L, double _R, int _d) {
+        top = _top; L = _L; R = _R; d = _d;
+    }
+    bool operator<(const Que &b)const {
+        return top < b.top;
+    }
+} Q[MX];
+
+int BS(double x) {
+    int L = 1, R = rear, m;
+    while(L <= R) {
+        m = (L + R) >> 1;
+        if(A[m] == x) return m;
+        if(A[m] > x) R = m - 1;
+        else L = m + 1;
+    }
+    return -1;
+}
+
+void push_up(int l, int r, int rt) {
+    if(cnt[rt]) S[rt] = A[r + 1] - A[l];
+    else if(l == r) S[rt] = 0;
+    else S[rt] = S[rt << 1] + S[rt << 1 | 1];
+}
+
+void update(int L, int R, int d, int l, int r, int rt) {
+    if(L <= l && r <= R) {
+        cnt[rt] += d;
+        push_up(l, r, rt);
+        return;
+    }
+
+    int m = (l + r) >> 1;
+    if(L <= m) update(L, R, d, lson);
+    if(R > m) update(L, R, d, rson);
+    push_up(l, r, rt);
+}
+
+int main() {
+    int n, ansk = 0;
+    //freopen("input.txt", "r", stdin);
+    while(~scanf("%d", &n), n) {
+        rear = 0;
+        memset(cnt, 0, sizeof(cnt));
+        memset(S, 0, sizeof(S));
+
+        for(int i = 1; i <= n; i++) {
+            double x1, y1, x2, y2;
+            scanf("%lf%lf%lf%lf", &x1, &y1, &x2, &y2);
+            Q[i] = Que(y1, x1, x2, 1);
+            Q[i + n] = Que(y2, x1, x2, -1);
+
+            A[++rear] = x1; A[++rear] = x2;
+        }
+        sort(Q + 1, Q + 1 + 2 * n);
+        sort(A + 1, A + 1 + rear);
+        rear = unique(A + 1, A + 1 + rear) - A - 1;
+
+        double ans = 0, last = 0;
+        for(int i = 1; i <= 2 * n; i++) {
+            ans += (Q[i].top - last) * S[1];
+            update(BS(Q[i].L), BS(Q[i].R) - 1, Q[i].d, root);
+            last = Q[i].top;
+        }
+        printf("Test case #%d\n", ++ansk);
+        printf("Total explored area: %.2lf\n\n", ans);
+    }
+    return 0;
+}

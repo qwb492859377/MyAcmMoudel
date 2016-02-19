@@ -1,0 +1,23 @@
+int vis[MX];
+bool Bgraph_check(int u) {
+    queue<PII>work;
+    work.push(PII(u, 0));
+
+    while(!work.empty()) {
+        PII f = work.front();
+        work.pop();
+
+        int u = f.first, c = f.second;
+
+        vis[u] = c;
+        for(int id = 0; ~id; id = Next[id]) {
+            int v = G[u][id];
+            if(vis[v] == c) return false;
+            if(vis[v] == -1) {
+                vis[v] = c ^ 1;
+                work.push(PII(v, c ^ 1));
+            }
+        }
+    }
+    return true;
+}

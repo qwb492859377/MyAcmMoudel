@@ -1,0 +1,27 @@
+/*ÁÚ½Ó±íÊ¡ÂÔ*/
+
+LL d[MX];
+void dijistra(int Begin){
+    memset(d, INF, sizeof(d));
+    d[Begin] = 0;
+
+    priority_queue<PLI,vector<PLI>,greater<PLI> >work;
+    work.push(PLI(0, Begin));
+
+    while(!work.empty()) {
+        PLI f = work.top();
+        work.pop();
+
+        LL dist = f.first;
+        int u = f.second;
+        if(d[u] < dist) continue;
+
+        for(int id = Head[u]; ~id; id = Next[id]) {
+            int cost = E[id].cost, v = E[id].v;
+            if(dist + cost < d[v]) {
+                d[v] = dist + cost;
+                work.push(PLI(dist + cost, v));
+            }
+        }
+    }
+}

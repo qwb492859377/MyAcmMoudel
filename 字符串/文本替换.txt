@@ -1,0 +1,16 @@
+string Replace(string s, string a, string b, bool Match = false) {//Match为真表示匹配大小写
+    string tmp = s;
+    if(!Match) {
+        transform(tmp.begin(), tmp.end(), tmp.begin(), ::tolower);
+        transform(a.begin(), a.end(), a.begin(), ::tolower);
+    }
+
+    int pos;
+    while(true) {
+        if((pos = tmp.find(a)) != -1) {
+            tmp.replace(pos, a.length(), b);
+            s.replace(pos, a.length(), b);
+        } else break;
+    }
+    return s;
+}

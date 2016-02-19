@@ -1,0 +1,167 @@
+#include<map>
+#include<set>
+#include<cmath>
+#include<stack>
+#include<queue>
+#include<cstdio>
+#include<cctype>
+#include<string>
+#include<vector>
+#include<cstring>
+#include<iostream>
+#include<algorithm>
+#include<functional>
+#define fuck printf("fuck")
+#define FIN freopen("input.txt","r",stdin)
+#define FOUT freopen("output.txt","w+",stdout)
+using namespace std;
+typedef long long LL;
+
+const int MX = 1000 + 5;
+const int MN = 1000000 + 5;
+const int INF = 0x3f3f3f3f;
+
+int ans[MX][MX];
+
+struct DLX {
+    int m, n;
+    int H[MX], S[MX];
+    int Row[MN], Col[MN], rear;
+    int L[MN], R[MN], U[MN], D[MN];
+
+    void Init(int _m, int _n) {
+        m = _m; n = _n;
+        rear = n;
+        for(int i = 0; i <= n; i++) {
+            S[i] = 0;
+            L[i] = i - 1;
+            R[i] = i + 1;
+            U[i] = D[i] = i;
+        }
+        L[0] = n; R[n] = 0;
+        for(int i = 1; i <= m; i++) {
+            H[i] = -1;
+        }
+    }
+
+    void Link(int r, int c) {
+        int rt = ++rear;
+        Row[rt] = r; Col[rt] = c; S[c]++;
+
+        D[rt] = D[c]; U[D[c]] = rt;
+        U[rt] = c; D[c] = rt;
+        if(H[r] == -1) {
+            H[r] = L[rt] = R[rt] = rt;
+        } else {
+            int id = H[r];
+            R[rt] = R[id]; L[R[id]] = rt;
+            L[rt] = id; R[id] = rt;
+        }
+    }
+
+    void Remove(int c) {
+        R[L[c]] = R[c]; L[R[c]] = L[c];
+        for(int i = D[c]; i != c; i = D[i]) {
+            for(int j = R[i]; j != i; j = R[j]) {
+                D[U[j]] = D[j]; U[D[j]] = U[j];
+                S[Col[j]]--;
+            }
+        }
+    }
+
+    void Resume(int c) {
+        for(int i = U[c]; i != c; i = U[i]) {
+            for(int j = L[i]; j != i; j = L[j]) {
+                D[U[j]] = U[D[j]] = j;
+                S[Col[j]]++;
+            }
+        }
+        R[L[c]] = L[R[c]] = c;
+    }
+
+    bool Dance(int cnt) {
+        if(R[0] == 0) return true;
+
+        int c = R[0];
+        for(int i = R[0]; i != 0; i = R[i]) {
+            if(S[i] < S[c]) c = i;
+        }
+
+        Remove(c);
+        for(int i = D[c]; i != c; i = D[i]) {
+            for(int j = R[i]; j != i; j = R[j]) Remove(Col[j]);
+
+            int r = Row[i];
+            ans[(r - 1) / 81 + 1][((r - 1) % 81) / 9 + 1] = ((r - 1) % 81) % 9 + 1;
+            if(Dance(cnt + 1)) return true;
+
+            for(int j = L[i]; j != i; j = L[j]) Resume(Col[j]);
+        }
+        Resume(c);
+        return false;
+    }
+} G;
+
+int S[MX][MX], vis[10];
+
+void check(int x, int y) {
+    for(int i = 1; i <= 9; i++) vis[i] = 0;
+    for(int i = 1; i <= 9; i++) {
+        vis[S[i][y]] = vis[S[x][i]] = 1;
+    }
+    int tx = (x - 1) / 3 + 1, ty = (y - 1) / 3 + 1;
+    for(int i = (tx - 1) * 3 + 1; i <= tx * 3; i++) {
+        for(int j = (ty - 1) * 3 + 1; j <= ty * 3; j++) {
+            vis[S[i][j]] = 1;
+        }
+    }
+}
+
+int main() {
+    int T; //FIN;
+    scanf("%d", &T);
+    while(T--) {
+        G.Init(9 * 9 * 9, 4 * 9 * 9);
+        for(int i = 1; i <= 9; i++) {
+            for(int j = 1; j <= 9; j++) {
+                scanf("%1d", &S[i][j]);
+            }
+        }
+
+        for(int i = 1; i <= 9; i++) {
+            for(int j = 1; j <= 9; j++) {
+                int tx = (i - 1) / 3 + 1, ty = (j - 1) / 3 + 1, tp = (tx - 1) * 3 + ty;
+
+                if(!S[i][j]) {
+                    check(i, j);
+                    for(int k = 1; k <= 9; k++) {
+                        if(vis[k]) continue;
+
+                        int id = ((i - 1) * 9 + j - 1) * 9 + k;
+                        G.Link(id, (i - 1) * 9 + j);
+                        G.Link(id, 9 * 9 + (i - 1) * 9 + k);
+                        G.Link(id, 2 * 9 * 9 + (j - 1) * 9 + k);
+                        G.Link(id, 3 * 9 * 9 + (tp - 1) * 9 + k);
+                    }
+                } else {
+                    int k = S[i][j];
+                    int id = ((i - 1) * 9 + j - 1) * 9 + k;
+                    G.Link(id, (i - 1) * 9 + j);
+                    G.Link(id, 9 * 9 + (i - 1) * 9 + k);
+                    G.Link(id, 2 * 9 * 9 + (j - 1) * 9 + k);
+                    G.Link(id, 3 * 9 * 9 + (tp - 1) * 9 + k);
+                }
+            }
+        }
+        int ret = G.Dance(0);
+        for(int i = 1; i <= 9; i++) {
+            for(int j = 1; j <= 9; j++) {
+                if(S[i][j]) printf("%d", S[i][j]);
+                else printf("%d", ans[i][j]);
+            }
+            printf("\n");
+        }
+
+    }
+    return 0;
+}

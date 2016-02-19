@@ -1,0 +1,24 @@
+/*其实就是主席树，话说这样写真的好飘逸。。
+build通常是用来初始化o[0]的*/
+int o[MX], ls[MX], rs[MX], s[MX], A[MX], sz;
+void build(int l, int r, int &rt) {
+    rt = ++sz;
+    if(l == r) {s[rt] = A[l]; return;}
+    int m = (l + r) >> 1;
+    build(l, m, ls[rt]);
+    build(m + 1, r, rs[rt]);
+}
+int query(int pos, int l, int r, int rt) {
+    if(l == r) return s[rt];
+    int m = (l + r) >> 1;
+    if(pos <= m) return query(pos, l, m, ls[rt]);
+    return query(pos, m + 1, r, rs[rt]);
+}
+void add(int pos, int val, int l, int r, int pr, int &rt) {
+    rt = ++sz;
+    if(l == r) {s[rt] = val; return;}
+    ls[rt] = ls[pr]; rs[rt] = rs[pr];
+    int m = (l + r) >> 1;
+    if(pos <= m) add(pos, val, l, m, ls[pr], ls[rt]);
+    else add(pos, val, m + 1, r, rs[pr], rs[rt]);
+}

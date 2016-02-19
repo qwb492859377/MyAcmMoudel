@@ -1,0 +1,66 @@
+#include<cstdio>
+#include<cstdlib>
+#include<cstring>
+#include<cmath>
+#include<vector>
+#include<queue>
+#include<algorithm>
+
+using namespace std;
+typedef long long LL;
+
+const int mod=1e9+7;
+const int MX=5000+5;
+const int INF=0x3f3f3f3f;
+
+int n,m,r;
+int vis[MX],Path[MX];
+vector<int>G[MX];
+
+struct Edge{
+    int u,v;
+    Edge(){}
+    Edge(int a,int b){
+        u=a;v=b;
+    }
+    int getv(int x){
+        if(u==x) return v;
+        return u;
+    }
+}E[MX];
+
+void Fleury(int u){
+    for(int i=0;i<G[u].size();i++){
+        int id=G[u][i];
+        if(!vis[id]){
+            int v=E[id].getv(u);
+            vis[id]=1;
+            Fleury(v);
+        }
+    }
+    Path[++r]=u;
+}
+
+int main(){
+    while(~scanf("%d%d",&n,&m)){
+        r=0;
+        memset(vis,0,sizeof(vis));
+        for(int i=1;i<=n;i++){
+            G[i].clear();
+        }
+
+        for(int i=1;i<=m;i++){
+            int u,v;
+            scanf("%d%d",&u,&v);
+            E[i]=Edge(u,v);
+            G[u].push_back(i);
+            G[v].push_back(i);
+        }
+
+        Fleury(1);
+        for(int i=1;i<=r;i++){
+            printf("%d%c",Path[i],i==r?'\n':' ');
+        }
+    }
+    return 0;
+}

@@ -1,0 +1,16 @@
+int S[MX], A[MX], n;
+
+/*返回的是1~x的和*/
+int query(int x) {
+    int ret = 0;
+    for(; x; x -= x & -x) {
+        ret += S[x];
+    }
+    return ret;
+}
+
+void update(int x, int d) {
+    for(; x <= n; x += x & -x) {
+        S[x] += d;
+    }
+}

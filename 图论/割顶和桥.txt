@@ -1,0 +1,122 @@
+#include<cstdio>
+#include<cmath>
+#include<cstring>
+#include<queue>
+#include<vector>
+#include<functional>
+#include<algorithm>
+
+using namespace std;
+typedef long long LL;
+typedef pair<int, int> PII;
+
+const int MX = 2e5 + 5;
+const int INF = 0x3f3f3f3f;
+
+int rear;
+int Head[MX], Next[MX];
+int Low[MX], DFN[MX], dfs_clock;
+int cut[MX];
+
+struct Edge {
+    int u, v, sign;
+} E[MX];
+
+void edge_init() {
+    rear = 0;
+    memset(Head, -1, sizeof(Head));
+    memset(Next, -1, sizeof(Next));
+}
+
+void edge_add(int u, int v) {
+    E[rear].u = u;
+    E[rear].v = v;
+    E[rear].sign = false;
+    Next[rear] = Head[u];
+    Head[u] = rear++;
+}
+
+void tarjan_init(){
+    dfs_clock = 0;
+    memset(DFN, 0, sizeof(DFN));
+    memset(cut, 0, sizeof(cut));
+}
+
+/*这样写的前提是，必须是没有重边的，。如果有重边，from要改成无向图的边的编号，这样就可以避免重边了~
+桥的性质lowv>DFN[u]
+割点的性质lowv>=DFN[u]或者为有>=2儿子的根节点
+*/
+int tarjan(int u, int from) {
+    Low[u] = DFN[u] = ++dfs_clock;
+
+    int child = 0;
+    for(int id = Head[u]; ~id; id = Next[id]) {
+        int v = E[id].v;
+
+        if(!DFN[v]) {
+            int lowv = tarjan(v, u);
+            Low[u] = min(Low[u], lowv);
+
+            if(lowv >= DFN[u]) {
+                cut[u] = 1;
+            }
+            if(lowv > DFN[u]) {
+                E[id].sign = 1;
+                E[id ^ 1].sign = 1;
+            }
+
+            child++;
+        } else if(v != from && DFN[v] < DFN[u]) {
+            Low[u] = min(Low[u], DFN[v]);
+        }
+    }
+
+    if(from == -1 && child == 1) cut[u] = 0;
+    return Low[u];
+}
+
+int main() {
+    int n, m;
+    scanf("%d%d", &n, &m);
+
+    edge_init();
+    tarjan_init();
+
+    for(int i = 1; i <= m; i++) {
+        int u, v;
+        scanf("%d%d", &u, &v);
+        edge_add(u, v);
+        edge_add(v, u);
+    }
+
+    tarjan(1, -1);//如果已经确定是连通图，就这样写
+    /*
+    否则要这样
+    for(int i = 1; i <= n; i++) {
+        if(!DFN[i]) tarjan(i, -1);
+    }
+    */
+    int cnt = 0, first = true;
+    for(int i = 1; i <= n; i++) {
+        if(cut[i]) {
+            cnt++;
+
+            if(first) first = false;
+            else printf(" ");
+            printf("%d", i);
+        }
+    }
+    printf("%s\n", cnt ? "" : "Null");
+
+    vector<PII>ans;
+    for(int i = 0; i < rear; i++) {
+        if(E[i].sign && E[i].u < E[i].v) {
+            ans.push_back(PII(E[i].u, E[i].v));
+        }
+    }
+    sort(ans.begin(), ans.end());
+    for(int i = 0; i < ans.size(); i++) {
+        printf("%d %d\n", ans[i].first, ans[i].second);
+    }
+    return 0;
+}

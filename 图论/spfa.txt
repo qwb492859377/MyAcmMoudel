@@ -1,0 +1,16 @@
+int spfa_dfs(int u) {
+    vis[u] = 1;
+    for(int k = Head[u]; ~k; k = Next[k]) {
+        int v = E[k].v;
+        double w = E[k].cost;
+        if(dcmp(d[u] + w - d[v]) < 0) {
+            d[v] = d[u] + w;
+            if(!vis[v]) {
+                int ret = spfa_dfs(v);
+                if(ret != -1)  return ret;
+            } else return v;
+        }
+    }
+    vis[u] = 0;
+    return -1;
+}

@@ -1,0 +1,62 @@
+int fa[MX], top[MX], siz[MX], son[MX], dep[MX], id[MX], rear;
+void DFS1(int u, int f, int d) {
+    fa[u] = f; dep[u] = d;
+    son[u] = 0; siz[u] = 1;
+    for(int i = Head[u]; ~i; i = E[i].nxt) {
+        int v = E[i].v;
+        if(v == f) continue;
+        DFS1(v, u, d + 1);
+        siz[u] += siz[v];
+        if(siz[son[u]] < siz[v]) {
+            son[u] = v;
+        }
+    }
+}
+void DFS2(int u, int tp) {
+    top[u] = tp;
+    id[u] = ++rear;
+    if(son[u]) DFS2(son[u], tp);
+    for(int i = Head[u]; ~i; i = E[i].nxt) {
+        int v = E[i].v;
+        if(v == fa[u] || v == son[u]) continue;
+        DFS2(v, v);
+    }
+}
+/*节点1不使用，建树要小心
+一般边使用更深的那个点的id编号来表示
+*/
+void HLD_presolve() {
+    rear = 0;
+    DFS1(1, 0, 1);
+    DFS2(1, 1);
+    for(int i = 0; i < 2 * (rear - 1); i += 2) {
+        int u = E[i].u, v = E[i].v;
+        if(dep[u] < dep[v]) swap(u, v);
+        A[id[u]] = E[i].cost;
+    }
+    A[1] = -INF;
+    build(1, rear, 1);
+}
+/*找到对应边的更深的点的id编号*/
+void HLD_update(int x, int d) {
+    x = (x - 1) * 2;
+    int u = E[x].u, v = E[x].v;
+    if(dep[u] < dep[v]) swap(u, v);
+    update(id[u], d, 1, rear, 1);
+}
+/*注意最后一个查询与单点更新的区别以及u==v就需要返回x*/
+int HLD_query(int u, int v) {
+    int tp1 = top[u], tp2 = top[v], ans = -INF;
+    while(tp1 != tp2) {
+        if(dep[tp1] < dep[tp2]) {
+            swap(u, v);
+            swap(tp1, tp2);
+        }
+        ans = max(ans, query(id[tp1], id[u], 1, rear, 1));
+        u = fa[tp1]; tp1 = top[u];
+    }
+    if(u == v) return ans;
+    if(dep[u] > dep[v]) swap(u, v);
+    ans = max(ans, query(id[son[u]], id[v], 1, rear, 1));
+    return ans;
+}

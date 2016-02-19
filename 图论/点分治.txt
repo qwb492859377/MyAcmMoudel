@@ -1,0 +1,40 @@
+/*点分治通常采用前序遍历*/
+int Tree_cnt(int u, int f) {
+    int ret = 1;
+    for(int i = Head[u]; ~i; i = E[i].nxt) {
+        int v = E[i].v;
+        if(v == f || vis[v]) continue;
+        ret += Tree_cnt(v, u);
+    }
+    return ret;
+}
+
+int G_DFS(int n, int u, int f, int &ansn, int &ansid) {
+    A[u] = 1; int ret = 0;
+    for(int i = Head[u]; ~i; i = E[i].nxt) {
+        int v = E[i].v;
+        if(v == f || vis[v]) continue;
+        int nxt = G_DFS(n, v, u, ansn, ansid);
+        ret = max(ret, nxt); A[u] += ret;
+    }
+    ret = max(ret, n - A[u]);
+    if(ret < ansn) ansn = ret, ansid = u;
+    return A[u];
+}
+
+/*一键查找树重心，注意打标记vis隔开子树*/
+int Tree_G(int u) {
+    int cnt = Tree_cnt(u, -1), ansn = INF, ansid = 0;
+    G_DFS(n, u, -1, ansn, ansid);
+    return ansid;
+}
+
+/*维护点到根的距离，用DFN标记方便排序*/
+void Tree_deep(int u, int f, int d, int &DFN) {
+    A[++DFN] = d;
+    for(int i = Head[u]; ~i; i = E[i].nxt) {
+        int v = E[i].v, cost = E[i].cost;
+        if(v == f || vis[v]) continue;
+        Tree_deep(v, u, d + cost, DFN);
+    }
+}

@@ -1,0 +1,59 @@
+int fa[MX], top[MX], siz[MX], son[MX], dep[MX], id[MX], rear;
+/*fa父节点，top重链开头起点，siz子树大小，son重儿子，dep深度，id新编号*/
+
+/*第一次DFS找到重边，并维护好siz,son,fa,dep*/
+void DFS1(int u, int f, int d) {
+    fa[u] = f; dep[u] = d;
+    son[u] = 0; siz[u] = 1;
+    for(int i = Head[u]; ~i; i = E[i].nxt) {
+        int v = E[i].v;
+        if(v == f) continue;
+        DFS1(v, u, d + 1);
+        siz[u] += siz[v];
+        if(siz[son[u]] < siz[v]) {
+            son[u] = v;
+        }
+    }
+}
+/*将重边编号好，维护id*/
+void DFS2(int u, int tp) {
+    top[u] = tp;
+    id[u] = ++rear;
+    if(son[u]) DFS2(son[u], tp);
+    for(int i = Head[u]; ~i; i = E[i].nxt) {
+        int v = E[i].v;
+        if(v == fa[u] || v == son[u]) continue;
+        DFS2(v, v);
+    }
+}
+/*用来给点编号，以及建立线段树，要用id编号建树*/
+void HLD_presolve() {
+    rear = 0;
+    DFS1(1, 0, 1);
+    DFS2(1, 1);
+    for(int i = 1; i <= rear; i++) {
+        A[id[i]] = B[i];
+    }
+    build(1, rear, 1);
+}
+/*修改，要注意使用id编号修改*/
+void HLD_update(int x, int d) {
+    update(id[x], d, 1, rear, 1);
+}
+/*路径查询*/
+int HLD_query(int u, int v) {
+    int tp1 = top[u], tp2 = top[v];
+    int sum = 0;
+    while(tp1 != tp2) {
+        if(dep[tp1] < dep[tp2]) {
+            swap(u, v);
+            swap(tp1, tp2);
+        }
+        sum += query(id[tp1], id[u], 1, rear, 1);
+        u = fa[tp1]; tp1 = top[u];
+    }
+
+    if(dep[u] > dep[v]) swap(u, v);
+    sum += query(id[u], id[v], 1, rear, 1);
+    return sum;
+}

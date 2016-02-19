@@ -1,0 +1,43 @@
+#define root 1,n,1
+#define lson l,m,rt<<1
+#define rson m+1,r,rt<<1|1
+
+LL MIN[MX << 2], MAX[MX << 2];
+void push_up(int rt) {
+    MIN[rt] = min(MIN[rt << 1], MIN[rt << 1 | 1]);
+    MAX[rt] = max(MAX[rt << 1], MAX[rt << 1 | 1]);
+}
+void build(int l, int r, int rt) {
+    if(l == r) {
+        scanf("%I64d", &MIN[rt]);
+        MAX[rt] = MIN[rt];
+        return;
+    }
+
+    int m = (l + r) >> 1;
+    build(lson);
+    build(rson);
+    push_up(rt);
+}
+LL query_min(int L, int R, int l, int r, int rt) {
+    if(L <= l && r <= R) {
+        return MIN[rt];
+    }
+
+    LL ret = INF;
+    int m = (l + r) >> 1;
+    if(L <= m) ret = min(ret, query(L, R, lson));
+    if(R > m)  ret = min(ret, query(L, R, rson));
+    return ret;
+}
+LL query_max(int L, int R, int l, int r, int rt) {
+    if(L <= l && r <= R) {
+        return MAX[rt];
+    }
+
+    LL ret = 0;
+    int m = (l + r) >> 1;
+    if(L <= m) ret = min(ret, query(L, R, lson));
+    if(R > m)  ret = min(ret, query(L, R, rson));
+    return ret;
+}

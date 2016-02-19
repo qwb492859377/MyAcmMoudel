@@ -1,0 +1,60 @@
+LL exgcd(LL a,LL b,LL &x,LL &y){
+    if(b==0){
+        x=1;y=0;
+        return a;
+    }
+    LL r=exgcd(b,a%b,x,y);
+    LL t=y;
+    y=x-a/b*y;
+    x=t;
+    return r;
+}
+
+有解的情况b==0或者c%gcd(a,b)==0
+
+对于方程ax+by=c
+设int d=gcd(a,b);
+则第一组解是x=x0*c/d,y=y0*c/d;
+
+多组解是
+x=x0+b/d*t
+y=y0-a/d*t
+
+那么找到x最小的正整数解对
+x=x0+b/d*t;
+故t和x0的符号应该相反
+设置t1=-t，得到x=x0-b/d*t1;
+令x=0，得到t1=x0*d/b
+x=x0-(b/d)*t1
+if(x<0) x+=b/d;
+y=y0-a/d*((x-x0)/(b/d));
+
+/*可以得到x>=bound时的x和y，返回true表示有解
+否则无解，我只想问这个模板无脑调用有木有~
+但是不同的题目特判不同，有的地方记得还是特判，比如a和b的正负和是否为0~*/
+LL exgcd(LL a, LL b, LL &x, LL &y) {
+    if(b == 0) {
+        x = 1; y = 0;
+        return a;
+    }
+    LL r = exgcd(b, a % b, x, y);
+    LL t = y;
+    y = x - a / b * y;
+    x = t;
+    return r;
+}
+bool solve(LL a, LL b, LL c, LL bound, LL &x, LL &y) {
+    LL xx, yy, d = exgcd(a, b, xx, yy);
+    if(c % d) return false;
+
+    xx = xx * c / d; yy = yy * c / d;
+    LL t = (bound - xx) * d / b;
+
+    x = xx + b / d * t;
+    if(x < bound) {
+        t++;
+        x = xx + b / d * t;
+    }
+    y = yy - a / d * t;
+    return true;
+}

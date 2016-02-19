@@ -1,0 +1,96 @@
+#include<map>
+#include<set>
+#include<cmath>
+#include<queue>
+#include<cstdio>
+#include<string>
+#include<vector>
+#include<cstring>
+#include<iostream>
+#include<algorithm>
+#include<functional>
+
+using namespace std;
+typedef long long LL;
+typedef pair<int, int> PII;
+
+const int MX = 5e4 + 5;
+const int MP = 1e6 + 5;
+const int MQ = 2e5 + 5;
+
+int n, unit, Qt;
+LL ans[MQ];
+int vis[MP], A[MX];
+
+struct Que {
+    int L, R, id;
+    bool operator<(const Que &b)const {
+        if(L / unit == b.L / unit) {
+            if(R == b.R) return L < b.L;
+            return R < b.R;
+        }
+        return L / unit < b.L / unit;
+    }
+} Q[MQ];
+
+void solve() {
+    LL sum = 0;
+    int L = 1, R = 0, c = 1;
+    while(c <= Qt) {
+        while(Q[c].L < L) {
+            vis[A[--L]]++;
+            if(vis[A[L]] == 1) {
+                sum += A[L];
+            }
+        }
+        while(Q[c].R > R) {
+            vis[A[++R]]++;
+            if(vis[A[R]] == 1) {
+                sum += A[R];
+            }
+        }
+        while(Q[c].L > L) {
+            vis[A[L]]--;
+            if(!vis[A[L]]) {
+                sum -= A[L];
+            }
+            L++;
+        }
+        while(Q[c].R < R) {
+            vis[A[R]]--;
+            if(!vis[A[R]]) {
+                sum -= A[R];
+            }
+            R--;
+        }
+        ans[Q[c++].id] = sum;
+    }
+}
+
+int main() {
+    //freopen("input.txt","r",stdin);
+    int T;
+    scanf("%d", &T);
+    while(T--) {
+        memset(vis, 0, sizeof(vis));
+        scanf("%d", &n);
+        unit = sqrt(n + 0.5);
+
+        for(int i = 1; i <= n; i++) {
+            scanf("%d", &A[i]);
+        }
+
+        scanf("%d", &Qt);
+        for(int i = 1; i <= Qt; i++) {
+            scanf("%d%d", &Q[i].L, &Q[i].R);
+            Q[i].id = i;
+        }
+        sort(Q + 1, Q + 1 + Qt);
+
+        solve();
+        for(int i = 1; i <= Qt; i++) {
+            printf("%I64d\n", ans[i]);
+        }
+    }
+    return 0;
+}

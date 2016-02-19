@@ -1,0 +1,16 @@
+void Query(char *S) {
+    int n = strlen(S), now = root, ret = 0;
+
+    for(int i = 0; i < n; i++) {
+        now = Next[now][S[i] - 'a'];
+        int temp = now;
+
+        while(temp != root) {
+            if(End[temp] && (last[End[temp]] == -1 || last[End[temp]] + len[temp] <= i)) {
+                ans[End[temp]]++;
+                last[End[temp]] = i;
+            }
+            temp = Fail[temp];
+        }
+    }
+}

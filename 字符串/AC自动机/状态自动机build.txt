@@ -1,0 +1,27 @@
+void Build() {
+    queue<int>Q;
+    Fail[root] = root;
+    for(int i = 0; i < 4; i++) {
+        if(Next[root][i] == -1) {
+            Next[root][i] = root;
+        } else {
+            Fail[Next[root][i]] = root;
+            Q.push(Next[root][i]);
+        }
+    }
+
+    while(!Q.empty()) {
+        int u = Q.front(); Q.pop();
+
+        //注意这一句话根据不同的情况修改
+        if(End[Fail[u]]) End[u] = 1;
+        for(int i = 0; i < 4; i++) {
+            if(Next[u][i] == -1) {
+                Next[u][i] = Next[Fail[u]][i];
+            } else {
+                Fail[Next[u][i]] = Next[Fail[u]][i];
+                Q.push(Next[u][i]);
+            }
+        }
+    }
+}

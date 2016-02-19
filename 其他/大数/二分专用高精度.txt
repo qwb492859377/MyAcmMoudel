@@ -1,0 +1,55 @@
+const int M = 10000;
+const int MLEN = 4;
+const int MLX = 100;
+
+struct Bint {
+    int A[MLX], r;
+
+    void Read(char S[]) {
+        int len = strlen(S);
+        if(len == 1 && S[0] == '0') {
+            r = 0; return;
+        }
+        r = (len - 1) / MLEN + 1;
+        for(int i = 1; i <= r; i++) {
+            int R = len - 4 * i + 3, L = max(R - 3, 0);
+            A[i] = 0;
+            for(int j = L; j <= R; j++) {
+                A[i] = A[i] * 10 + S[j] - '0';
+            }
+        }
+    }
+
+    void Divide() {
+        int add = 0, t;
+        for(int i = r; i >= 1; i--) {
+            t = add * M + A[i];
+            add = t % 2;
+            A[i] = t / 2;
+        }
+        while(r && !A[r]) r--;
+    }
+
+    void Print() {
+        printf("%d", A[r]);
+        for(int i = r - 1; i >= 1; i--) printf("%04d", A[i]);
+    }
+
+    void Subtract() {
+        int sub = 1;
+        for(int i = 1; i <= r; i++) {
+            if(!sub) break;
+            if(A[i]) A[i]--, sub = 0;
+            else A[i] = M - 1;
+        }
+        while(r && !A[r]) r--;
+    }
+
+    bool Zero() {
+        return r == 0;
+    }
+
+    bool Odd() {
+        return A[1] & 1;
+    }
+};

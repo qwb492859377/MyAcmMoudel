@@ -1,0 +1,41 @@
+const int M = 30;//n的log
+
+int dep[MX], fa[MX][M], n;
+void DFS(int u, int _dep, int _fa) {
+    dep[u] = _dep; fa[u][0] = _fa;
+    for(int i = Head[u]; ~i; i = E[i].nxt) {
+        int v = E[i].v;
+        if(v == u || v == _fa) continue;
+        DFS(v, _dep + 1, u);
+    }
+}
+/*记得构图后要初始化一遍*/
+void presolve() {
+    DFS(1, 0, 1);
+    for(int i = 1; i < M; i++) {
+        for(int j = 1; j <= n; j++) {
+            fa[j][i] = fa[fa[j][i - 1]][i - 1];
+        }
+    }
+}
+/*倍增法要理解对2的次方的枚举顺序
+如果是要走固定步数，那么顺序枚举与i位与为1就行
+如果是要求一个临界位置，那么要从大到小枚举
+*/
+int LCA(int u, int v) {
+    while(dep[u] != dep[v]) {
+        if(dep[u] < dep[v]) swap(u, v);
+        int d = dep[u] - dep[v];
+        for(int i = 0; i < M; i++) {
+            if(d >> i & 1) u = fa[u][i];
+        }
+    }
+    if(u == v) return u;
+    for(int i = M - 1; i >= 0; i--) {
+        if(fa[u][i] != fa[v][i]) {
+            u = fa[u][i];
+            v = fa[v][i];
+        }
+    }
+    return fa[u][0];
+}

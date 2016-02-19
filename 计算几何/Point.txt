@@ -1,0 +1,16 @@
+struct Point {
+    double x, y;
+    Point(double _x = 0, double _y = 0) {
+        x = _x; y = _y;
+    }
+    Point operator-(Point p) {
+        x -= p.x; y -= p.y;
+        return *this;
+    }
+    double len() {
+        return sqrt(x * x + y * y);
+    }
+    double operator*(Point p) {
+        return x * p.x + y * p.y;
+    }
+};

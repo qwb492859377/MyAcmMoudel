@@ -1,0 +1,23 @@
+bool vis[MX];
+int prime[MX], mu[MX], tot;
+
+void miu_init() {
+    memset(vis, 0, sizeof(vis));
+    mu[1] = 1; tot = 0;
+    for(int i = 2; i < MX; i++) {
+        if(!vis[i]) {
+            prime[tot++] = i;
+            mu[i] = -1;
+        }
+        for(int j = 0; j < tot; j++) {
+            if(i * prime[j] >= MX) break;
+            vis[i * prime[j]] = 1;
+            if(i % prime[j] == 0) {
+                mu[i * prime[j]] = 0;
+                break;
+            } else {
+                mu[i * prime[j]] = -mu[i];
+            }
+        }
+    }
+}

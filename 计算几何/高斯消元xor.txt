@@ -1,0 +1,38 @@
+int gauss(int equ, int var) {
+    int max_r, col, k;
+    for(k = 0, col = 0; k < equ && col < var; k++, col++) {
+        max_r = k;
+        for(int i = k + 1; i < equ; i++) {
+            if(A[i][col] > A[max_r][col]) {
+                max_r = i;
+            }
+        }
+        if(A[max_r][col] == 0) {
+            k--;
+            continue;
+        }
+        if(max_r != k) {
+            for(int j = col; j < var + 1; j++) {
+                swap(A[k][j], A[max_r][j]);
+            }
+        }
+        for(int i = k + 1; i < equ; i++) {
+            if(A[i][col] != 0) {
+                for(int j = col; j < var + 1; j++) {
+                    A[i][j] ^= A[k][j];
+                }
+            }
+        }
+    }
+    for(int i = k; i < equ; i++) {
+        if(A[i][col] != 0) return -1;
+    }
+    if(k < var) return var - k;
+
+    for(int i = var - 1; i >= 0; i--) {
+        for(int j = i + 1; j < var; j++) {
+            A[i][var] ^= (A[i][j] && A[j][var]);
+        }
+    }
+    return 0;
+}

@@ -1,0 +1,37 @@
+¿ìÅÅ
+void qsort(int A[],int L,int R){
+    if(L>=R) return;
+
+    int s=A[L],l=L,r=R;
+    while(l<r){
+        while(l<r&&A[r]>=s) r--;
+        A[l]=A[r];
+
+        while(l<r&&A[l]<=s) l++;
+        A[r]=A[l];
+    }
+    A[l]=s;
+
+    qsort(A,L,l-1);
+    qsort(A,l+1,R);
+}
+
+Ã°ÅÝ
+void psort(int A[],int L,int R){
+    for(int i=L;i<R;i++){
+        for(int j=L;j<R-i;j++){
+            if(A[j]>A[j+1]){
+                int temp=A[j+1];
+                A[j+1]=A[j];
+                A[j]=temp;
+            }
+        }
+    }
+}
+
+ÆÓËØµÄ
+for(int i=0;i<n-1;i++){
+    for(int j=0;j<n-1-i;j++){
+      /***********/  
+    }
+}

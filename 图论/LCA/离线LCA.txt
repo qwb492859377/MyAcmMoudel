@@ -1,0 +1,73 @@
+const int MQ = 40000 + 5;
+const int MX = 80000 + 5;
+
+struct Edge {
+    int v, d;
+    Edge(int _v, int _d) {
+        v = _v; d = _d;
+    }
+};
+struct Que {
+    int id, u, v;
+    Que() {}
+    Que(int _u, int _v, int _id) {
+        u = _u; v = _v; id = _id;
+    }
+} A[MQ];
+
+int D[MX];
+struct LCA {
+    int n, ans[MQ];//答案按照id保存在ans中
+    int P[MX]; bool vis[MX];
+
+    vector<Edge>E[MX];
+    vector<Que>Q[MQ];
+
+    void Init(int _n) {
+        n = _n;
+        memset(ans, -1, sizeof(ans));
+        memset(vis, false, sizeof(vis));
+        for(int i = 1; i <= n; i++) {
+            E[i].clear();
+            Q[i].clear();
+            P[i] = i;
+        }
+    }
+
+    void AddQue(int u, int v, int id) {
+        Q[u].push_back(Que(u, v, id));
+        Q[v].push_back(Que(v, u, id));
+    }
+
+    void AddEdge(int u, int v, int d) {
+        E[u].push_back(Edge(v, d));
+        E[v].push_back(Edge(u, d));
+    }
+
+    int Find(int x) {
+        return P[x] == x ? x : (P[x] = Find(P[x]));
+    }
+
+    void Union(int u, int v) {
+        int p1 = Find(u), p2 = Find(v);
+        P[p1] = p2;
+    }
+
+    /*初始DFS(root,root)*/
+    void DFS(int u, int f, int d) {
+        D[u] = d;
+        for(int i = 0; i < E[u].size(); i++) {
+            int v = E[u][i].v, cost = E[u][i].d;
+            if(v != f) DFS(v, u, d + cost);
+        }
+
+        vis[u] = 1;
+        for(int i = 0; i < Q[u].size(); i++) {
+            int v = Q[u][i].v, id = Q[u][i].id;
+            if(vis[v]) {
+                ans[id] = Find(v);
+            }
+        }
+        Union(u, f);
+    }
+} lca;

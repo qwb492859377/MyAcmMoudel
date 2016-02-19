@@ -1,0 +1,30 @@
+½âÂë
+int base64_decode(char *A, unsigned char *B) {
+    int n = strlen(A), r = 0;
+    for(int t = 0; t < n / 4 - 1; t++) {
+        int ret = 0;
+        for(int j = t * 4; j < (t + 1) * 4; j++) {
+            ret = ret << 6 | ID(A[j]);
+        }
+        B[r++] = ret >> 16 & 255;
+        B[r++] = ret >> 8 & 255;
+        B[r++] = ret & 255;
+    }
+
+    int ret = 0;
+    for(int j = n - 4; j <= n - 1; j++) {
+        if(A[j] != '=') ret = ret << 6 | ID(A[j]);
+    }
+    if(A[n - 2] == '=' && A[n - 1] == '=') {
+        B[r++] = ret >> 4 & 255;
+    } else if(A[n - 1] == '=') {
+        B[r++] = ret >> 10 & 255;
+        B[r++] = ret >> 2 & 255;
+    } else {
+        B[r++] = ret >> 16 & 255;
+        B[r++] = ret >> 8 & 255;
+        B[r++] = ret & 255;
+    }
+    B[r] = 0;
+    return r;
+}

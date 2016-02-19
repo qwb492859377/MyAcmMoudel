@@ -1,0 +1,12 @@
+void push_up(int l, int r, int rt) {
+    if(cnt[rt]) {
+        S1[rt] = A[r + 1] - A[l];
+        if(cnt[rt] == 1) {
+            S2[rt] = S1[rt << 1] + S1[rt << 1 | 1];
+        } else S2[rt] = S1[rt];
+    } else if(l == r) S1[rt] = S2[rt] = 0;
+    else {
+        S1[rt] = S1[rt << 1] + S1[rt << 1 | 1];
+        S2[rt] = S2[rt << 1] + S2[rt << 1 | 1];
+    }
+}

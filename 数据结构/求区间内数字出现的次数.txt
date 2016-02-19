@@ -1,0 +1,35 @@
+struct Data{
+    int x, id;
+    bool operator<(const Data &P) const{
+        return x < P.x;
+    }
+};
+
+Data A[MX];
+int W, n;
+
+void init() {
+    W = sqrt(n + 0.5);
+    int e = (n - 1) / W + 1;
+    for(int i = 1; i <= e; i++) {
+        sort(A + (i - 1)*W + 1, A + min(i * W, n) + 1);
+    }
+}
+
+int solve(int L, int R, int x) {
+    int ret = 0, l = (L - 1) / W + 1, r = (R - 1) / W + 1;
+    for(int i = (l - 1) * W + 1; i <= min(l * W, n); i++) {
+        if(A[i].x == x && A[i].id >= L) ret++;
+    }
+    if(l == r) return ret;
+
+    for(int i = (r - 1) * W + 1; i <= min(r * W, n); i++) {
+        if(A[i].x == x && A[i].id <= R) ret++;
+    }
+
+    Data p; p.x = x;
+    for(int i = l + 1; i <= r - 1; i++) {
+        ret += upper_bound(A + (i - 1) * W + 1, A + i * W + 1, p) - lower_bound(A + (i - 1) * W + 1, A + i * W + 1, p);
+    }
+    return ret;
+}

@@ -1,0 +1,6 @@
+C++¿©’ª
+#pragma comment(linker, "/STACK:102400000,102400000") 
+G++¿©’ªfuck√≤À∆≤ªø…“‘£ø
+int Size = 256 << 20;
+char *p = (char*)malloc(Size) + Size;
+__asm__("movl %0, %%esp\n" :: "r"(p));

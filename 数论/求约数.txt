@@ -1,0 +1,20 @@
+void init(){
+    for(int i=1;i<MX;i++){
+        for(int j=i;j<MX;j+=i){
+            G[j].push_back(i);
+        }
+    }
+}
+
+可以用14000KB，140MS求出10W内的所有约数并打表
+
+可以单个求约数
+LL n,s[MX];
+int e=sqrt(n+0.5),rear=0;
+for(int i=1;i<=e;i++){
+    if(n%i) continue;
+
+    s[++rear]=i;
+    s[++rear]=n/i;
+}
+sort(s+1,s+rear+1);

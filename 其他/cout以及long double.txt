@@ -1,0 +1,4 @@
+#include<iomanip>
+cout<<fixed<<setprecision(15)<<a;设置精度为15
+
+typedef long double LDB;//ldb只能用cout输出

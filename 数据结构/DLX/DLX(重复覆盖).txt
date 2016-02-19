@@ -1,0 +1,90 @@
+const int MX = 300 + 5;
+const int MN = 90000 + 5;
+const int INF = 0x3f3f3f3f;
+
+struct DLX {
+    int m, n, ans;
+    int H[MX], S[MX], vis[MX];
+    int Row[MN], Col[MN], rear;
+    int L[MN], R[MN], U[MN], D[MN];
+
+    void Init(int _m, int _n) {
+        m = _m; n = _n;
+        rear = n; ans = INF;
+        for(int i = 0; i <= n; i++) {
+            S[i] = 0;
+            L[i] = i - 1;
+            R[i] = i + 1;
+            U[i] = D[i] = i;
+        }
+        L[0] = n; R[n] = 0;
+        for(int i = 1; i <= m; i++) {
+            H[i] = -1;
+        }
+    }
+
+    void Link(int r, int c) {
+        int rt = ++rear;
+        Row[rt] = r; Col[rt] = c; S[c]++;
+
+        D[rt] = D[c]; U[D[c]] = rt;
+        U[rt] = c; D[c] = rt;
+        if(H[r] == -1) {
+            H[r] = L[rt] = R[rt] = rt;
+        } else {
+            int id = H[r];
+            R[rt] = R[id]; L[R[id]] = rt;
+            L[rt] = id; R[id] = rt;
+        }
+    }
+
+    void Remove(int c) {
+        for(int i = D[c]; i != c; i = D[i]) {
+            R[L[i]] = R[i]; L[R[i]] = L[i];
+        }
+    }
+
+    void Resume(int c) {
+        for(int i = U[c]; i != c; i = U[i]) {
+            R[L[i]] = L[R[i]] = i;
+        }
+    }
+
+    int h() {
+        int ret = 0;
+        memset(vis, 0, sizeof(vis));
+        for(int c = R[0]; c != 0; c = R[c]) {
+            if(!vis[c]) {
+                ret++;
+                vis[c] = 1;
+                for(int i = D[c]; i != c; i = D[i]) {
+                    for(int j = R[i]; j != i; j = R[j]) {
+                        vis[Col[j]] = 1;
+                    }
+                }
+            }
+        }
+        return ret;
+    }
+
+    void Dance(int cnt) {
+        if(cnt + h() >= ans) return;
+        if(R[0] == 0) {
+            ans = min(ans, cnt);
+            return;
+        }
+
+        int c = R[0];
+        for(int i = R[0]; i != 0; i = R[i]) {
+            if(S[i] < S[c]) c = i;
+        }
+
+        for(int i = D[c]; i != c; i = D[i]) {
+            Remove(i);
+            for(int j = R[i]; j != i; j = R[j]) Remove(j);
+            Dance(cnt + 1);
+            for(int j = L[i]; j != i; j = L[j]) Resume(j);
+            Resume(i);
+        }
+    }
+} G;

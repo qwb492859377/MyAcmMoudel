@@ -1,0 +1,17 @@
+bool is_int(double x) {
+    int a = round(x);
+    if(fabs(x - a) < exps) return true;
+    return false;
+}
+
+int to_int(double x) {//向下取整防误差
+    int l = x, r = x + 1;
+    if(r - x < exps) return r;
+    return l;
+}
+
+
+int dcmp(double x) {
+    if(fabs(x) < exps) return 0;
+    return x < 0 ? -1 : 1;
+}

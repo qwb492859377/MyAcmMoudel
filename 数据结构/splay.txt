@@ -1,0 +1,92 @@
+int size[MX];
+int num[MX], col[MX], n, m;
+int son[MX][2], fa[MX], root, sz;
+void Link(int x, int y, int c) {
+    fa[x] = y; son[y][c] = x;
+}
+void push_up(int rt) {
+    size[rt] = size[son[rt][0]] + size[son[rt][1]] + 1;
+}
+void push_down(int rt) {
+    if(col[rt]) {
+        col[son[rt][0]] ^= 1;
+        col[son[rt][1]] ^= 1;
+        swap(son[rt][0], son[rt][1]);
+        col[rt] = 0;
+    }
+}
+void Rotate(int x, int c) {
+    int y = fa[x];
+    push_down(y); push_down(x);
+    Link(x, fa[y], son[fa[y]][1] == y);
+    Link(son[x][!c], y, c);
+    Link(y, x, !c);
+    push_up(y);
+}
+void Splay(int x, int g) {
+    push_down(x);
+    while(fa[x] != g) {
+        int y = fa[x], cx = son[y][1] == x, cy = son[fa[y]][1] == y;
+        if(fa[y] == g) Rotate(x, cx);
+        else {
+            if(cx == cy) Rotate(y, cy);
+            else Rotate(x, cx);
+            Rotate(x, cy);
+        }
+    }
+    push_up(x);
+    if(!g) root = x;
+}
+void NewNode(int f, int &rt) {
+    rt = ++sz;
+    fa[rt] = f, size[rt] = 1;
+    son[rt][0] = son[rt][1] = col[rt] = 0;
+}
+int Select(int k, int g) {
+    int rt = root;
+    while(size[son[rt][0]] != k) {
+        if(size[son[rt][0]] > k) rt = son[rt][0];
+        else k -= size[son[rt][0]] + 1, rt = son[rt][1];
+        push_down(rt);
+    }
+    Splay(rt, g);
+    return rt;
+}
+void Build(int l, int r, int &rt, int f) {
+    if(l > r) return;
+    int m = (l + r) >> 1, t;
+    NewNode(f, rt); num[rt] = m;
+    Build(l, m - 1, son[rt][0], rt);
+    Build(m + 1, r, son[rt][1], rt);
+    push_up(rt);
+}
+void Prepare(int n) {
+    sz = 0;
+    NewNode(0, root); num[1] = 0;
+    NewNode(root, son[root][1]); num[2] = 0;
+    Build(1, n, son[2][0], 2);
+    Splay(3, 0);
+}
+void Print(int rt, int &DFN){
+    if(!rt) return;
+    push_down(rt);
+    Print(son[rt][0], DFN);
+    if(num[rt]) printf("%d%c", num[rt], ++DFN == n ? '\n' : ' ');
+    Print(son[rt][1], DFN);
+}
+void Flip(int l, int r){
+    Select(l - 1, 0);
+    Select(r + 1, root);
+    col[son[son[root][1]][0]] ^= 1;
+}
+void Cut(int a, int b, int c){
+    Select(a - 1, 0);
+    Select(b + 1, root);
+    int w = son[son[root][1]][0];
+    son[son[root][1]][0] = 0;
+    Splay(son[root][1], 0);
+    Select(c, 0);
+    Select(c + 1, root);
+    son[son[root][1]][0] = w;
+    Splay(son[root][1], 0);
+}

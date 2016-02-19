@@ -1,0 +1,37 @@
+/*a,b,p<=1e5*/
+LL Comb(LL a, LL b, LL p) {
+    if(a < b)   return 0;
+    if(a == b)  return 1;
+    if(b > a - b)   b = a - b;
+
+    LL ans = 1, ca = 1, cb = 1;
+    for(LL i = 0; i < b; ++i) {
+        ca = (ca * (a - i)) % p;
+        cb = (cb * (b - i)) % p;
+    }
+    ans = (ca * power(cb, p - 2, p)) % p;
+    return ans;
+}
+
+LL Lucas(LL n, LL m, LL p) {
+    LL ans = 1;
+
+    while(n && m && ans) {
+        ans = (ans * Comb(n % p, m % p, p)) % p;
+        n /= p;
+        m /= p;
+    }
+    return ans;
+}
+
+LL exgcd(LL a, LL b, LL &x, LL &y) {
+    if(b == 0) {
+        x = 1; y = 0;
+        return a;
+    }
+    LL r = exgcd(b, a % b, x, y);
+    LL t = y;
+    y = x - a / b * y;
+    x = t;
+    return r;
+}

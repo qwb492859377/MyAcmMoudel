@@ -1,0 +1,27 @@
+int HLD_query(int u, int v) {
+    int tp1 = top[u], tp2 = top[v], ret = 0;
+    int lastla[2] = { -1, -1}, lastra[2] = { -1, -1}, la[2] = { -1, -1}, ra[2] = { -1, -1};
+    while(tp1 != tp2) {
+        if(dep[tp1] >= dep[tp2]) {
+            ret += query(id[tp1], id[u], 1, rear, 1, la[0], ra[0]);
+            if(ra[0] == lastla[0]) ret--;
+            lastla[0] = la[0]; lastra[0] = ra[0];
+            u = fa[tp1]; tp1 = top[u];
+        } else {
+            ret += query(id[tp2], id[v], 1, rear, 1, la[1], ra[1]);
+            if(ra[1] == lastla[1]) ret--;
+            lastla[1] = la[1]; lastra[1] = ra[1];
+            v = fa[tp2]; tp2 = top[v];
+        }
+    }
+    if(dep[u] <= dep[v]) {
+        ret += query(id[u], id[v], 1, rear, 1, la[1], ra[1]);
+        if(ra[1] == lastla[1]) ret--;
+        if(la[1] == lastla[0]) ret--;
+    } else {
+        ret += query(id[v], id[u], 1, rear, 1, la[0], ra[0]);
+        if(ra[0] == lastla[0]) ret--;
+        if(la[0] == lastla[1]) ret--;
+    }
+    return ret;
+}

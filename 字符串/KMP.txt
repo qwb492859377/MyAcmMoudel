@@ -1,0 +1,43 @@
+/*会有重叠部分*/
+int Next[MX];
+
+int KMP(char *A, char *B) {
+    int m = strlen(A), n = strlen(B);
+
+    Next[0] = 0;
+    for(int i = 1; i < n; i++) {
+        int k = Next[i - 1];
+        while(B[i] != B[k] && k) k = Next[k - 1];
+        Next[i] = B[i] == B[k] ? k + 1 : 0;
+    }
+
+    int ans = 0, j = 0;
+    for(int i = 0; i < m; i++) {
+        while(A[i] != B[j] && j) j = Next[j - 1];
+        if(A[i] == B[j]) j++;
+        if(j == n) ans++;
+    }
+    return ans;
+}
+
+/*不会有重叠部分*/
+int Next[MX];
+
+int KMP(char *A, char *B) {
+    int m = strlen(A), n = strlen(B);
+
+    Next[0] = 0;
+    for(int i = 1; i < n; i++) {
+        int k = Next[i - 1];
+        while(B[i] != B[k] && k) k = Next[k - 1];
+        Next[i] = B[i] == B[k] ? k + 1 : 0;
+    }
+
+    int ans = 0, j = 0;
+    for(int i = 0; i < m; i++) {
+        while(A[i] != B[j] && j) j = Next[j - 1];
+        if(A[i] == B[j]) j++;
+        if(j == n) ans++, j = 0;
+    }
+    return ans;
+}

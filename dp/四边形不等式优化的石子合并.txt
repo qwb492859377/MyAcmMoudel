@@ -1,0 +1,42 @@
+#include<cstdio>
+#include<cstdlib>
+#include<cstring>
+#include<cmath>
+#include<queue>
+#include<vector>
+#include<algorithm>
+using namespace std;
+const int MX=100+5;
+ 
+int S[MX],dp[MX][MX],K[MX][MX];
+ 
+int main(){
+    int T,n,t;
+    scanf("%d",&T);
+    while(T--){
+        memset(dp,0x3f,sizeof(dp));
+        scanf("%d",&n);
+ 
+        S[0]=0;
+        for(int i=1;i<=n;i++){
+            scanf("%d",&t);
+            dp[i][i]=0;
+            K[i][i]=i;
+            S[i]=S[i-1]+t;
+        }
+ 
+        for(int l=2;l<=n;l++){
+            for(int i=1;i<=n-l+1;i++){
+                for(int j=K[i][i+l-2];j<=K[i+1][i+l-1];j++){
+                    int temp=dp[i][j]+dp[j+1][i+l-1]+S[i+l-1]-S[i-1];
+                    if(temp<dp[i][i+l-1]){
+                        dp[i][i+l-1]=temp;
+                        K[i][i+l-1]=j;
+                    }
+                }
+            }
+        }
+        printf("%d\n",dp[1][n]);
+    }
+    return 0;
+}

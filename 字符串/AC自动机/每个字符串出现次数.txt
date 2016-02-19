@@ -1,0 +1,12 @@
+void Query(char *S) {
+    int n = strlen(S), now = root;
+    for(int i = 0; i < n; i++) {
+        now = Next[now][S[i] - 'a'];
+        int temp = now;
+
+        while(temp != root) {
+            if(End[temp]) ans[End[temp]]++;
+            temp = Fail[temp];
+        }
+    }
+}

@@ -1,0 +1,100 @@
+#include<cstdio>
+#include<cstdlib>
+#include<cstring>
+#include<cmath>
+#include<queue>
+#include<algorithm>
+#pragma comment(linker,"/STACK:102400000,102400000")
+
+using namespace std;
+typedef long long LL;
+
+const int mod = 1e9 + 7;
+const int MX = 250000 + 5;
+const int INF = 0x3f3f3f3f;
+
+int Path[MX], r = 0;
+int IN[80000], OUT[80000];
+vector<int>G[80000];
+
+char ans[MX];
+
+int Get(char*s) {
+    return s[0] * 255 + s[1];
+}
+
+int check() {
+    int a = 0, b = 0, c = 0, r1 = -1, r2 = -1;
+
+    for(int j = 0; j <= 255; j++) {
+        for(int k = 0; k <= 255; k++) {
+            int i = j * 255 + k;
+            if(!IN[i] && !OUT[i]) continue;
+
+            r1 = i;
+            if(IN[i] == OUT[i]) continue;
+
+            a++;
+            if(IN[i] == OUT[i] + 1) {
+                b++;
+                r2 = i;
+            }
+            if(IN[i] + 1 == OUT[i]) c++;
+        }
+    }
+
+    if(a == 0) {
+        return r1;
+    } else if(a == 2 && b == 1 && c == 1) {
+        return r2;
+    } else {
+        return -1;
+    }
+}
+
+void Fleury(int u) {
+    int s = G[u].size();
+    while(s) {
+        int v = *(G[u].end() - 1);
+        G[u].erase(G[u].end() - 1);
+
+        Fleury(v);
+        s = G[u].size();
+    }
+    Path[++r] = u;
+}
+
+int main() {
+    memset(IN, 0, sizeof(IN));
+    memset(OUT, 0, sizeof(OUT));
+
+    int n; char word[10];
+
+    scanf("%d", &n);
+    for(int i = 1; i <= n; i++) {
+        scanf("%s", word);
+
+        int L = Get(word), R = Get(word + 1);
+        IN[L]++; OUT[R]++;
+        G[L].push_back(R);
+    }
+
+    int Beg = check();
+    if(Beg == -1) {
+        printf("NO\n");
+        return 0;
+    }
+
+    Fleury(Beg);
+    if(r != n + 1) {
+        printf("NO\n");
+        return 0;
+    }
+    printf("YES\n");
+
+    printf("%c%c", Path[r] / 255, Path[r] % 255);
+    for(int i = r - 1; i >= 1; i--) {
+        printf("%c", Path[i] % 255);
+    }
+    return 0;
+}

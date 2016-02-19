@@ -1,0 +1,27 @@
+/*二分图，最差O(n^3)*/
+int match[MX];
+bool G[MX][MX], vis[MX];
+bool DFS(int vn, int u) {
+    for(int v = 1; v <= vn; v++){
+        if(G[u][v] && !vis[v]) {
+            vis[v] = 1;
+            if(match[v] == -1 || DFS(vn, match[v])) {
+                match[v] = u;
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+/*u点的个数，v点的个数
+G[u][v]表示一条边从u->v
+*/
+int BM(int un, int vn) {
+    int res = 0;
+    memset(match, -1, sizeof(match));
+    for(int u = 0; u <= un; u++) {
+        memset(vis, 0, sizeof(vis));
+        if(DFS(vn, u)) res++;
+    }
+    return res;
+}

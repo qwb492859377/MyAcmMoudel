@@ -1,0 +1,15 @@
+int Query(char *S) {
+    int n = strlen(S), now = root, ret = 0;
+    for(int i = 0; i < n; i++) {
+        now = Next[now][S[i] - 'a'];
+        int temp = now;
+
+        while(temp != root) {
+            ret += End[temp];
+            //如果要多次匹配，下面改成vis标记
+            End[temp] = 0;
+            temp = Fail[temp];
+        }
+    }
+    return ret;
+}

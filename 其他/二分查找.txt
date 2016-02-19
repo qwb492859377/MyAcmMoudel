@@ -1,0 +1,21 @@
+int BS(int A[], int L, int R, int x) {
+    int l = L, r = R, m;
+    while(l <= r) {
+        m = (l + r) >> 1;
+        if(A[m] == x) return m;
+        if(A[m] < x)  l = m + 1;
+        else        r = m - 1;
+    }
+    return -1;
+}
+
+int BS(int x) {
+    int l = 1, r = rear, m;
+    while(l <= r) {
+        m = (l + r) >> 1;
+        if(A[m] == x) return m;
+        if(A[m] < x)  l = m + 1;
+        else        r = m - 1;
+    }
+    return -1;
+}

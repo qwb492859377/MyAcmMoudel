@@ -1,0 +1,11 @@
+/*x % m = a*/
+LL china(int n, int m[], int a[]) {
+    LL M = 1, d, y, x = 0;
+    for(int i = 0; i < n; i++) M *= m[i];
+    for(int i = 0; i < n; i++) {
+        LL w = M / m[i];
+        d = exgcd(m[i], w, d, y);
+        x = (x + multi(multi(y, w, M), a[i], M)) % M;
+    }
+    return (x + M) % M;
+}

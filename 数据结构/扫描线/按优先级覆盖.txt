@@ -1,0 +1,32 @@
+void push_up(int l, int r, int rt) {
+    if(cnt[rt][3]) {
+        S[rt][1] = S[rt][2] = 0;
+        S[rt][3] = A[r + 1] - A[l];
+    } else if(cnt[rt][2]) {
+        S[rt][3] = S[rt << 1][3] + S[rt << 1 | 1][3];
+        S[rt][2] = A[r + 1] - A[l] - S[rt][3];
+        S[rt][1] = 0;
+    } else if(cnt[rt][1]) {
+        S[rt][3] = S[rt << 1][3] + S[rt << 1 | 1][3];
+        S[rt][2] = S[rt << 1][2] + S[rt << 1 | 1][2];
+        S[rt][1] = A[r + 1] - A[l] - S[rt][3] - S[rt][2];
+    } else if(l == r) S[rt][1] = S[rt][2] = S[rt][3] = 0;
+    else {
+        S[rt][1] = S[rt << 1][1] + S[rt << 1 | 1][1];
+        S[rt][2] = S[rt << 1][2] + S[rt << 1 | 1][2];
+        S[rt][3] = S[rt << 1][3] + S[rt << 1 | 1][3];
+    }
+}
+
+void update(int L, int R, int d, int s, int l, int r, int rt) {
+    if(L <= l && r <= R) {
+        cnt[rt][s] += d;
+        push_up(l, r, rt);
+        return;
+    }
+
+    int m = (l + r) >> 1;
+    if(L <= m) update(L, R, d, s, lson);
+    if(R > m) update(L, R, d, s, rson);
+    push_up(l, r, rt);
+}
