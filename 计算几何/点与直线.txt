@@ -1,0 +1,126 @@
+const double eps = 1e-8;
+
+class Point {
+public:
+    double x, y;
+    Point() {}
+    Point(double _x, double _y) {
+        x = _x; y = _y;
+    }
+    //两点间距离
+    double Dist(const Point &W) const {
+        return sqrt((x - W.x) * (x - W.x) + (y - W.y) * (y - W.y));
+    }
+    //两点是否相等
+    bool operator == (const Point &W) const {
+        return fabs(W.x - x) < eps && abs(W.y - y) < eps;
+    }
+};
+
+class PVector {
+public:
+    Point s, e; //两点式子
+    double a, b, c;//一般式
+    PVector() {}
+    PVector(const Point &_s, const Point &_e) {
+        s = _s; e = _e;
+    }
+    //点与向量叉积
+    double operator *(const Point &W) const {
+        return (W.y - s.y) * (e.x - s.x) - (W.x - s.x) * (e.y - s.y);
+    }
+    //向量与向量叉积
+    double operator *(const PVector &W) const {
+        return (e.x - s.x) * (W.e.y - W.s.y) - (e.y - s.y) * (W.e.x - W.s.x);
+    }
+    //两点式换成一般式
+    void PT() {
+        a = s.y - e.y;
+        b = e.x - s.x;
+        c = s.x * e.y - s.y * e.x;
+    }
+    /*----------点与直线----------*/
+    bool OnLine(const Point &W) {
+        return fabs((*this) * W) < eps;
+    }
+    bool OnSeg(const Point &W) {
+        return OnLine(W) && W.x - min(s.x, e.x) > -eps && W.x - max(s.x, e.x) < eps && W.y - min(s.y, e.y) > -eps && W.y - max(s.y, e.y) < eps;
+    }
+    double Dist(const Point &W, bool isSegment = false) {
+        PT();
+        //到直线垂足的距离
+        double td = (a * W.x + b * W.y + c) / sqrt(a * a + b * b);
+        //如果是线段判断垂足
+        if(isSegment) {
+            double xp = (b * b * W.x - a * b * W.y - a * c) / ( a * a + b * b);
+            double yp = (-a * b * W.x + a * a * W.y - b * c) / (a * a + b * b);
+            double xb = max(s.x, e.x), yb = max(s.y, e.y);
+            double xs = s.x + e.x - xb, ys = s.y + e.y - yb;
+            if(xp > xb + eps || xp < xs - eps || yp > yb + eps || yp < ys - eps)
+                td = min(W.Dist(s), W.Dist(e));
+        }
+        return fabs(td);
+    }
+    //关于直线对称的点
+    Point Mirror(const Point &W) {
+        //注意先转为一般式
+        Point ret; PT();
+        double d = a * a + b * b;
+        ret.x = (b * b * W.x - a * a * W.x - 2 * a * b * W.y - 2 * a * c) / d;
+        ret.y = (a * a * W.y - b * b * W.y - 2 * a * b * W.x - 2 * b * c) / d;
+        return ret;
+    }
+    static PVector PPLine(const Point &_a, const Point &_b) {
+        PVector ret;
+        ret.s.x = (_a.x + _b.x) / 2;
+        ret.s.y = (_a.y + _b.y) / 2;
+        //一般式
+        ret.a = _b.x - _a.x;
+        ret.b = _b.y - _a.y;
+        ret.c = (_a.y - _b.y) * ret.s.y + (_a.x - _b.x) * ret.s.x;
+        //两点式
+        if(fabs(ret.a) > eps) {
+            ret.e.y = 0.0;
+            ret.e.x = - ret.c / ret.a;
+            if(ret.e == ret.s) {
+                ret.e.y = 1e10;
+                ret.e.x = - (ret.c - ret.b * ret.e.y) / ret.a;
+            }
+        } else {
+            ret.e.x = 0.0;
+            ret.e.y = - ret.c / ret.b;
+            if(ret.e == ret. s) {
+                ret.e.x = 1e10;
+                ret.e.y = - (ret.c - ret.a * ret.e.x) / ret.b;
+            }
+        }
+        return ret;
+    }
+    /*--------直线与直线----------*/
+    Point CrossLPt(PVector W) {
+        //注意先判断平行和重合
+        Point ret = s;
+        double t = ((s.x - W.s.x) * (W.s.y - W.e.y) - (s.y - W.s.y) * (W.s.x - W.e.x))
+                   / ((s.x - e.x) * (W.s.y - W.e.y) - (s.y - e.y) * (W.s.x - W.e.x));
+        ret.x += (e.x - s.x) * t;
+        ret.y += (e.y - s.y) * t;
+        return ret;
+    }
+    /*---------线段与直线--------*/
+    bool CrossSL(const PVector &W) const {
+        double rs = (*this) * W.s;
+        double re = (*this) * W.e;
+        return rs * re < eps;
+    }
+    /*---------线段与线段--------*/
+    bool IsCrossSS(const PVector &W) const {
+        return (
+                   (max(s.x, e.x) + eps >= min(W.s.x, W.e.x)) &&
+                   (max(W.s.x, W.e.x) + eps >= min(s.x, e.x)) &&
+                   (max(s.y, e.y) + eps >= min(W.s.y, W.e.y)) &&
+                   (max(W.s.y, W.e.y) + eps >= min(s.y, e.y)) &&
+                   ((PVector(W.s, s) * W) * (W * PVector(W.s, e)) >= eps) &&
+                   ((PVector(s, W.s) * (*this)) * ((*this) * PVector(s, W.e)) >= eps)
+               );
+    }
+};

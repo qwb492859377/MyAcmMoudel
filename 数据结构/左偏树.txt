@@ -8,10 +8,10 @@ const int MX = 1000 + 5;
 struct Data {
     int l, r, key, dist;
 } D[MX << 1];
-int rear;
+int rear, root;
 
 int lt_init() {
-    rear = 0;
+    rear = root = 0;
     D[0].dist = -1;
 }
 int lt_new(int _key = 0) {
@@ -45,6 +45,5 @@ void lt_push(int &rt, int key) {
 
 /*使用的时候
 lt_init();
-int rt=0;
 lt_push(rt,1);
 */
