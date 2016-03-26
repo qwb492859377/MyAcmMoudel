@@ -32,7 +32,7 @@ void guass(mat &A, int m, int n) {
         }
     }
 }
-
+/*-1无解，0多组解，1唯一解*/
 int solve(mat &A) {
     int m = A.size(), n = A[0].size() - 1;
     guass(A, m, n);

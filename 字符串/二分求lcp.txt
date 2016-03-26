@@ -1,0 +1,29 @@
+const int seed = 131;
+typedef unsigned long long ULL;
+ULL fac[MX], pre[MX];
+char A[MX];
+void presolve() {
+    fac[0] = 1;
+    for(int i = 1; i < MX; i++) {
+        fac[i] = fac[i - 1] * seed;
+    }
+}
+bool check(int a, int b, int l) {
+    ULL left = pre[a + l - 1] - pre[a - 1] * fac[l];
+    ULL right = pre[b + l - 1] - pre[b - 1] * fac[l];
+    return left == right;
+}
+int lcp(int n, int a, int b) {
+    pre[0] = 0;
+    for(int i = 1; i <= n; i++) {
+        pre[i] = pre[i - 1] * seed + A[i];
+    }
+
+    int l = 0, r = n, m;
+    while(l <= r) {
+        m = (l + r) >> 1;
+        if(check(a, b, m)) l = m + 1;
+        else r = m - 1;
+    }
+    return l - 1;
+}

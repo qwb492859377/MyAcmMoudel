@@ -1,0 +1,48 @@
+int Bcnt, Top, Index;
+int Low[MX], DFN[MX];
+int belong[MX], Stack[MX];
+bool inStack[MX];
+/*∏¥‘”∂»O(n + m)*/
+void Init_tarjan(int n) {
+    Bcnt = Top = Index = 0;
+    for(int i = 1; i <= n; ++i) Low[i] = DFN[i] = 0;
+}
+void Tarjan(int u) {
+    Stack[Top++] = u;
+    inStack[u] = 1;
+    Low[u] = DFN[u] = ++Index;
+    for(int i = Head[u]; ~i; i = E[i].nxt) {
+        int v = E[i].v;
+        if(!DFN[v]) {
+            Tarjan(v);
+            Low[u] = min( Low[v], Low[u]);
+        } else if(inStack[v]) {
+            Low[u] = min( Low[u], DFN[v]);
+        }
+    }
+    if(Low[u] == DFN[u]) {
+        ++Bcnt;
+        int v;
+        do {
+            v = Stack[--Top];
+            inStack[v] = 0;
+            belong[v] = Bcnt;
+        } while(u != v);
+    }
+}
+
+int cnt[MX];
+LL solve(int n) {
+    Init_tarjan(n);
+    for (int i = 1; i <= n; i++) {
+        if (!DFN[i]) Tarjan(i);
+    }
+    LL ans = 0;
+    for(int i = 1; i <= n; i++) {
+        cnt[belong[i]]++;
+    }
+    for(int i = 1; i <= Bcnt; i++) {
+        ans += (LL)cnt[i] * (cnt[i] - 1) / 2;
+    }
+    return ans;
+}

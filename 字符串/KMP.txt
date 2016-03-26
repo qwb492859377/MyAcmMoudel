@@ -1,3 +1,17 @@
+int Next[MX], n;
+void GetNext() {
+    Next[0] = 0;
+    for(int i = 1; i < n; i++) {
+        int j = Next[i - 1];
+        while(j && S[i] != S[j]) j = Next[j - 1];
+        Next[i] = S[i] == S[j] ? j + 1 : 0;
+    }
+}
+/*求前缀i循环节最长长度*/
+int GetCir(int p) {
+    return (p + 1) % (p - Next[p] + 1) == 0 ? p - Next[p] + 1 : p + 1;
+}
+
 /*会有重叠部分*/
 int Next[MX];
 

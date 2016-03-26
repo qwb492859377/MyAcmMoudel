@@ -1,11 +1,12 @@
-/*二分图，最差O(n^3)*/
+/*二分图，最差O(nm)，注意E数组的大小*/
 int match[MX];
-bool G[MX][MX], vis[MX];
-bool DFS(int vn, int u) {
-    for(int v = 1; v <= vn; v++){
-        if(G[u][v] && !vis[v]) {
+bool vis[MX];
+bool DFS(int u) {
+    for(int i = Head[u]; ~i; i = E[i].nxt) {
+        int v = E[i].v;
+        if(!vis[v]) {
             vis[v] = 1;
-            if(match[v] == -1 || DFS(vn, match[v])) {
+            if(match[v] == -1 || DFS(match[v])) {
                 match[v] = u;
                 return 1;
             }
@@ -13,15 +14,12 @@ bool DFS(int vn, int u) {
     }
     return 0;
 }
-/*u点的个数，v点的个数
-G[u][v]表示一条边从u->v
-*/
-int BM(int un, int vn) {
+int BM(int n) {
     int res = 0;
     memset(match, -1, sizeof(match));
-    for(int u = 0; u <= un; u++) {
+    for(int u = 1; u <= n; u++) {
         memset(vis, 0, sizeof(vis));
-        if(DFS(vn, u)) res++;
+        if(DFS(u)) res++;
     }
     return res;
 }

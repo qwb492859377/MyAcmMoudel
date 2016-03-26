@@ -1,0 +1,38 @@
+const double eps = 1e-8;
+
+struct Point {
+    double x, y;
+}p[505];
+
+double dist(Point A, Point B) {
+    return sqrt((A.x - B.x) * (A.x - B.x) + (A.y - B.y) * (A.y - B.y));
+}
+Point circumcenter(Point A, Point B, Point C) {
+    Point ret;
+    double a1 = B.x - A.x, b1 = B.y - A.y, c1 = (a1 * a1 + b1 * b1) / 2;
+    double a2 = C.x - A.x, b2 = C.y - A.y, c2 = (a2 * a2 + b2 * b2) / 2;
+    double d = a1 * b2 - a2 * b1;
+    ret.x = A.x + (c1 * b2 - c2 * b1) / d;
+    ret.y = A.y + (a1 * c2 - a2 * c1) / d;
+    return ret;
+}
+void min_cover_circle(Point *p, int n, Point &c, double &r) {
+    random_shuffle(p, p + n);
+    c = p[0]; r = 0;
+    for(int i = 1; i < n; i++) {
+        if(dist(p[i], c) > r + eps) {
+            c = p[i]; r = 0;
+            for(int j = 0; j < i; j++)
+                if(dist(p[j], c) > r + eps) {
+                    c.x = (p[i].x + p[j].x) / 2;
+                    c.y = (p[i].y + p[j].y) / 2;
+                    r = dist(p[j], c);
+                    for(int k = 0; k < j; k++)
+                        if(dist(p[k], c) > r + eps) {
+                            c = circumcenter(p[i], p[j], p[k]);
+                            r = dist(p[i], c);
+                        }
+                }
+        }
+    }
+}
