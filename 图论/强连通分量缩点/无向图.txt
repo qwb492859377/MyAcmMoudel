@@ -1,0 +1,30 @@
+int first[nMax],nxt[nMax],to[nMax],e;  
+void addadge(int u,int v) {  
+    to[e]=v;nxt[e]=first[u];first[u]=e;e++;  
+    to[e]=u;nxt[e]=first[v];first[v]=e;e++;  
+}  
+int low[nMax],dfn[nMax],dep,belong[nMax],vis[nMax],st[nMax],top,cnt;  
+void tarjan(int u,int E) {  
+    low[u] = dfn[u] = dep;dep++;  
+    vis[u] = 1;  
+    st[++top] = u;  
+    for(int i=first[u];i!=-1;i=nxt[i]) {  
+        if((E^1) == i) continue;  
+        if(!vis[to[i]]) {  
+            tarjan(to[i],i);  
+            low[u] = min(low[u],low[to[i]]);  
+        }else {  
+            low[u] = min(low[u],dfn[to[i]]);  
+        }  
+    }  
+    if(low[u] == dfn[u]){  
+        do{  
+            belong[st[top]] = cnt;  
+        }while(top && st[top--] != u);  
+        cnt ++;  
+    }  
+}  
+//重新建图啦  
+for(int i=0;i<m;i++) {  
+    if(belong[edge[i].l] != belong[edge[i].r]) addadge(belong[adge[i].l],belong[edge[i].r]);  
+}  

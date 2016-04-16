@@ -1,0 +1,112 @@
+#include <map>
+#include <set>
+#include <cmath>
+#include <ctime>
+#include <stack>
+#include <queue>
+#include <cstdio>
+#include <cctype>
+#include <string>
+#include <vector>
+#include <cstring>
+#include <iomanip>
+#include <iostream>
+#include <algorithm>
+#include <functional>
+#define fuck(x) cout<<"["<<x<<"]"
+#define FIN freopen("input.txt","r",stdin)
+#define FOUT freopen("output.txt","w+",stdout)
+using namespace std;
+typedef long long LL;
+typedef pair<int, int> PII;
+
+const int MX = 4e5 + 5;
+const int INF = 0x3f3f3f3f;
+
+int sum[MX], flag[MX], n, DFN;
+int val[MX], ans[MX], tmp[MX];
+struct Data {
+    int op, id, x, y, k, cnt;
+    Data() {}
+    Data(int _op, int _id, int _x, int _y, int _k) {
+        op = _op; id = _id;
+        x = _x; y = _y; k = _k;
+    }
+} A[MX], T1[MX], T2[MX];
+void add(int x, int y, int id) {
+    for(int i = x; i <= n; i += i & -i) {
+        if(flag[i] != id) flag[i] = id, sum[i] = 0;
+        sum[i] += y;
+    }
+}
+int ask(int x, int id) {
+    int ret = 0;
+    for(int i = x; i; i -= i & -i) {
+        if(flag[i] == id) ret += sum[i];
+    }
+    return ret;
+}
+void solve(int L, int R, int l, int r) {
+    if(L > R) return;
+    if(l == r) {
+        for(int i = L; i <= R; i++) {
+            if(A[i].op == 3) ans[A[i].id] = l;
+        }
+        return;
+    }
+
+    int m = (l + r) >> 1; DFN++;
+    for(int i = L; i <= R; i++) {
+        if(A[i].op == 1 && A[i].y <= m) add(A[i].x, 1, DFN);
+        if(A[i].op == 2 && A[i].y <= m) add(A[i].x, -1, DFN);
+        if(A[i].op == 3) tmp[i] = ask(A[i].y, DFN) - ask(A[i].x - 1, DFN);
+    }
+    int l1 = 0, l2 = 0;
+    for(int i = L; i <= R; i++) {
+        if(A[i].op == 3) {
+            if(A[i].cnt + tmp[i] >= A[i].k) T1[++l1] = A[i];
+            else A[i].cnt += tmp[i], T2[++l2] = A[i];
+        } else if(A[i].y <= m) T1[++l1] = A[i];
+        else T2[++l2] = A[i];
+    }
+    for(int i = 1; i <= l1; i++) A[L + i - 1] = T1[i];
+    for(int i = 1; i <= l2; i++) A[L + l1 + i - 1] = T2[i];
+    solve(L, L + l1 - 1, l, m);
+    solve(L + l1, R, m + 1, r);
+}
+
+int main() {
+    //FIN;
+    while(~scanf("%d", &n)) {
+        int sz = 0, Q, qsz = 0, Max = 0; DFN = 0;
+        memset(sum, 0, sizeof(sum));
+
+        for(int i = 1; i <= n; i++) {
+            scanf("%d", &val[i]);
+            A[++sz] = Data(1, -1, i, val[i], -1);
+            Max = max(Max, val[i]);
+        }
+        scanf("%d", &Q);
+        for(int i = 1; i <= Q; i++) {
+            int op, x, y, k;
+            scanf("%d%d%d", &op, &x, &y);
+            if(op == 1) {
+                A[++sz] = Data(2, -1, x, val[x], -1);
+                A[++sz] = Data(1, -1, x, y, -1);
+                Max = max(Max, y);
+                val[x] = y;
+            } else {
+                qsz++;
+                scanf("%d", &k);
+                A[++sz] = Data(3, qsz, x, y, k);
+                A[sz].cnt = 0;
+            }
+        }
+        solve(1, sz, 0, Max);
+
+        for(int i = 1; i <= qsz; i++) {
+            printf("%d\n", ans[i]);
+        }
+    }
+    return 0;
+}

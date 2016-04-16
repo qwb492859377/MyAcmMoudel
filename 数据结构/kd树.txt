@@ -1,0 +1,42 @@
+struct Point {
+    int xy[2], l, r, id;
+    void read(int i) {
+        id = i;
+        scanf("%d%d", &xy[0], &xy[1]);
+    }
+} P[MX];
+int cmpw; LL ans;
+int idx[MX];
+
+bool cmp(const Point &a, const Point &b) {
+    return a.xy[cmpw] < b.xy[cmpw];
+}
+int build(int l, int r, int w) {
+    int m = (l + r) >> 1; cmpw = w;
+    nth_element(P + l, P + m, P + 1 + r, cmp);
+    idx[P[m].id] = m;
+    P[m].l = l != m ? build(l, m - 1, !w) : 0;
+    P[m].r = r != m ? build(m + 1, r, !w) : 0;
+    return m;
+}
+LL dist(LL x, LL y = 0) {
+    return x * x + y * y;
+}
+void query(int rt, int w, LL x, LL y) {
+    LL temp = dist(x - P[rt].xy[0], y - P[rt].xy[1]);
+    if(temp) ans = min(ans, temp);
+    if(P[rt].l && P[rt].r) {
+        bool sign = !w ? (x <= P[rt].xy[0]) : (y <= P[rt].xy[1]);
+        LL d = !w ? dist(x - P[rt].xy[0]) : dist(y - P[rt].xy[1]);
+        query(sign ? P[rt].l : P[rt].r, !w, x, y);
+        if(d < ans) query(sign ? P[rt].r : P[rt].l, !w, x, y);
+    } else if(P[rt].l) query(P[rt].l, !w, x, y);
+    else if(P[rt].r) query(P[rt].r, !w, x, y);
+}
+
+int rt = build(1, n, 0);
+for(int i = 1; i <= n; i++) {
+    ans = 1e18;
+    query(rt, 0, P[idx[i]].xy[0], P[idx[i]].xy[1]);
+    printf("%I64d\n", ans);
+}

@@ -1,0 +1,57 @@
+const double pi = acos(-1.0);
+struct cp {
+    double x, y;
+    cp() {}
+    cp (double x, double y): x(x), y(y) {}
+    inline cp operator + (const cp &b) {
+        return cp(x + b.x, y + b.y);
+    }
+    inline cp operator - (const cp &b) {
+        return cp(x - b.x, y - b.y);
+    }
+    inline cp operator * (const cp &b) {
+        return cp(x * b.x - y * b.y, x * b.y + y * b.x);
+    }
+} a[MX], b[MX];
+
+int r[MX];
+void fft(cp a[], int opt, int n) {
+    for(int i = 0; i < n; i++) {
+        if(i < r[i]) swap(a[i], a[r[i]]);
+    }
+    for(int i = 1; i < n; i <<= 1) {
+        cp wn(cos(pi / i), opt * sin(pi / i));
+        for(int p = i << 1, j = 0; j < n; j += p) {
+            cp w(1, 0);
+            for(int k = 0; k < i; k++, w = wn * w) {
+                cp x = a[j + k], y = w * a[j + k + i];
+                a[j + k] = x + y; a[j + k + i] = x - y;
+            }
+        }
+    }
+}
+/*多项式a，最高次为n，多项式b，最高次为m
+从0到n项的系数
+卷积结果等于后来a[].x
+复杂度O(nlogn)，最后的最高项为n+m
+初始化时读入到x中，y为复数赋值为0
+*/
+void solve(cp a[], cp b[], int n, int m) {
+    int l = 0, nn, nm = n + m;
+    for(nn = 1; nn <= nm; nn <<= 1) l++;
+    for(int i = n + 1; i <= nn; i++) a[i] = cp(0, 0);
+    for(int i = m + 1; i <= nn; i++) b[i] = cp(0, 0);
+    n = nn; m = nm;
+
+    for(int i = 0; i < n; i++) {
+        r[i] = (r[i >> 1] >> 1) | ((i & 1) << (l - 1));
+    }
+    fft(a, 1, n); fft(b, 1, n);
+    for(int i = 0; i <= n; i++) {
+        a[i] = a[i] * b[i];
+    }
+    fft(a, -1, n);
+    for(int i = 0; i <= m; i++) {
+        a[i].x /= n;
+    }
+}
