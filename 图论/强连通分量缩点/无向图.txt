@@ -1,30 +1,42 @@
-int first[nMax],nxt[nMax],to[nMax],e;  
-void addadge(int u,int v) {  
-    to[e]=v;nxt[e]=first[u];first[u]=e;e++;  
-    to[e]=u;nxt[e]=first[v];first[v]=e;e++;  
-}  
-int low[nMax],dfn[nMax],dep,belong[nMax],vis[nMax],st[nMax],top,cnt;  
-void tarjan(int u,int E) {  
-    low[u] = dfn[u] = dep;dep++;  
-    vis[u] = 1;  
-    st[++top] = u;  
-    for(int i=first[u];i!=-1;i=nxt[i]) {  
-        if((E^1) == i) continue;  
-        if(!vis[to[i]]) {  
-            tarjan(to[i],i);  
-            low[u] = min(low[u],low[to[i]]);  
-        }else {  
-            low[u] = min(low[u],dfn[to[i]]);  
-        }  
-    }  
-    if(low[u] == dfn[u]){  
-        do{  
-            belong[st[top]] = cnt;  
-        }while(top && st[top--] != u);  
-        cnt ++;  
-    }  
-}  
-//重新建图啦  
-for(int i=0;i<m;i++) {  
-    if(belong[edge[i].l] != belong[edge[i].r]) addadge(belong[adge[i].l],belong[edge[i].r]);  
-}  
+int DFN[MX], Low[MX], dsz, tim;
+int Stack[MX], inStack[MX], Belong[MX], bsz, ssz;
+
+void trajan(int u, int e) {
+    inStack[u] = 1;
+    Stack[++ssz] = u;
+    DFN[u] = Low[u] = ++dsz;
+    for(int i = Head[u]; ~i; i = E[i].nxt) {
+        int v = E[i].v;
+        if((i ^ 1) == e) continue;
+        if(!DFN[v]) {
+            trajan(v, i);
+            Low[u] = min(Low[u], Low[v]);
+        } else if(inStack[v]) {
+            Low[u] = min(Low[u], Low[v]);
+        }
+    }
+    if(DFN[u] == Low[u]) {
+        bsz++; int v;
+        do {
+            v = Stack[ssz--];
+            inStack[v] = 0;
+            Belong[v] = bsz;
+        } while(ssz && v != u);
+    }
+}
+void tarjan_solve(int n) {
+    dsz = bsz = ssz = 0;
+    memset(DFN, 0, sizeof(DFN));
+    for(int i = 1; i <= n; i++) {
+        if(!DFN[i]) trajan(i, -1);
+    }
+    /*缩点*/
+    edge_init();
+    for(int i = 0; i < 2 * m; i += 2) {
+        int u = E[i].u, v = E[i].v;
+        u = Belong[u]; v = Belong[v];
+        if(u == v) continue;
+        edge_add(u, v);
+        edge_add(v, u);
+    }
+}
